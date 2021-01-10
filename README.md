@@ -19,7 +19,17 @@ wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.i
 ansible-playbook create-ubuntu-template.yml -i ../inventory/hosts --extra-vars "local_iso_path=$(pwd)/focal-server-cloudimg-amd64.img"
 ```
 
-## Provision C2 Server
+## C2 Server
+
+### C2 Configuration Variables
+
+Modify the C2 configuration variables as necessary.
+
+```bash
+c2/c2-config.yml
+```
+
+### Provision C2 Server
 
 ```bash
 cd ../c2/
@@ -29,8 +39,8 @@ terraform plan  # Enter Proxmox hostname/IP when prompted
 terraform apply
 ```
 
-## Configure C2 Server
+### Configure C2 Server
 
 ```bash
-ansible-playbook c2-config.yml -i ../inventory/hosts
+ansible-playbook c2-configure.yml -i ../inventory/hosts
 ```

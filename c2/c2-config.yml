@@ -1,80 +1,9 @@
-- name: Configure Covenant C2 server
-  become: true
-  hosts: c2
-  remote_user: '{{ c2_user }}'
+proxmox_hostname_or_ip: 192.168.1.10
+proxmox_user: root@pam
+proxmox_node: pve
 
-  vars:
-    c2_user: covenant
-    
-  tasks:
-
-    - name: Install aptitude using apt
-      apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
-
-    - name: Install required system packages
-      apt: name={{ item }} state=latest update_cache=yes
-      loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
-
-    - name: Add Docker GPG apt Key
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
-
-    - name: Add Docker Repository
-      apt_repository:
-        repo: deb https://download.docker.com/linux/ubuntu bionic stable
-        state: present
-
-    - name: Update apt and install docker-ce
-      apt: update_cache=yes name=docker-ce state=latest
-
-    - name: Install Docker Module for Python
-      pip:
-        name: docker
-
-    - name: Add covenant user to docker group
-      user:
-        name: covenant
-        groups: docker
-        append: yes
-
-    - name: Reboot so docker group membership is activated
-      reboot:
-
-    - name: Clone the Covenant repository
-      git:
-        repo: https://github.com/cobbr/Covenant
-        dest: /home/{{ c2_user }}/Covenant
-        recursive: yes
-        update: yes
-        version: master
-
-    - name: Build Covenant docker image
-      community.general.docker_image:
-        build:
-          path: /home/covenant/Covenant/Covenant
-          pull: no
-        name: covenant
-        tag: latest
-        source: build
-
-    - name: Start Covenant docker container
-      community.general.docker_container:
-        name: covenant
-        image: covenant:latest
-        mounts:
-          - type: bind
-            source: /home/{{ c2_user }}/Covenant/Covenant/Data
-            target: /app/Data
-        published_ports:
-          - 7443:7443
-          - 443:443
-          - 80:80
-        tty: yes
-        interactive: yes
-        restart_policy: always
-        container_default_behavior: compatibility
-
-    - name: Clean up any dangling Docker images
-      community.general.docker_prune:
-        images: yes
+c2_hostname: c2
+c2_domain: tgif.home
+c2_ip: 192.168.1.40/24
+c2_default_gateway: 192.168.1.1
+c2_user: covenant
