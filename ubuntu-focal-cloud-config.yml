@@ -1,0 +1,20 @@
+#cloud-config
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - git
+  - curl
+  - qemu-guest-agent
+
+users:
+  - name: ${user}
+    groups: sudo
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    ssh_authorized_keys: ${ssh_key}
+
+preserve_hostname: false
+manage_etc_hosts: false
+fqdn: ${hostname}.${domain}
