@@ -1,0 +1,9 @@
+proxmox_hostname_or_ip: 192.168.1.10
+proxmox_user: root@pam
+proxmox_node: pve
+
+c2_hostname: c2
+c2_domain: tgif.home
+c2_ip: 192.168.1.40/24
+c2_default_gateway: 192.168.1.1
+c2_user: covenant
