@@ -35,9 +35,9 @@
       pip:
         name: docker
 
-    - name: Add covenant user to docker group
+    - name: Add user to docker group
       user:
-        name: covenant
+        name: "{{ c2_user }}"
         groups: docker
         append: yes
 

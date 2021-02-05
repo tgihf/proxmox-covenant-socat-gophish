@@ -1,0 +1,9 @@
+proxmox_hostname_or_ip: 192.168.1.10
+proxmox_user: root@pam
+proxmox_node: pve
+
+phishing_server_hostname: phishing
+phishing_server_domain: tgif.home
+phishing_server_ip: 192.168.1.250/24
+phishing_server_default_gateway: 192.168.1.1
+phishing_server_user: gophish
