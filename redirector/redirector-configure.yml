@@ -1,0 +1,24 @@
+- name: Configure socat redirector
+  become: true
+  hosts: redirectors
+  remote_user: '{{ redirector_user }}'
+
+  vars_files:
+    - redirector-config.yml  # redirector_user & c2_ip read from redirector-config.yml var file
+    
+  tasks:
+    - name: Install prerequisites
+      apt: name={{ item }} update_cache=yes state=latest force_apt_get=yes
+      loop: [ 'aptitude' ]
+
+    - name: Install socat
+      apt: name=socat update_cache=yes state=latest
+
+    - name: Start socat redirection on TCP port 80
+      shell: socat TCP4-LISTEN:80,fork TCP4:{{ c2_ip }}:80
+      async: 2592000
+      poll: 0
+    - name: Start socat redirection on TCP port 443
+      shell: socat TCP4-LISTEN:443,fork TCP4:{{ c2_ip }}:443
+      async: 2592000
+      poll: 0

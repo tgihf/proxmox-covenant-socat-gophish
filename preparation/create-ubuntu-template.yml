@@ -1,0 +1,46 @@
+- name: Create Ubuntu cloudinit template in Proxmox
+  become: true
+  hosts: pve
+  remote_user: root
+
+  vars:
+    proxmox_iso_path: /var/lib/vz/template/iso
+
+  vars_prompt:
+    - name: template_id
+      prompt: "Template ID: "
+      private: no
+      default: 10000
+    - name: template_name
+      prompt: "Template name: "
+      private: no
+      default: ubuntu-focal-cloudinit
+    
+  tasks:
+
+    - name: Ensure {{ proxmox_iso_path }} exists
+      file:
+        path: '{{ proxmox_iso_path }}'
+        state: directory
+
+    - name: Copy Ubuntu cloudinit image to Proxmox
+      copy:
+        src: '{{ local_iso_path }}'
+        dest: '{{ proxmox_iso_path }}'
+        owner: root
+        group: root
+
+    - name: Create cloudinit VM template
+      shell: |
+        qm create {{ template_id }} -name {{ template_name }} -memory 1024 -net0 virtio,bridge=vmbr0 -cores 1 -sockets 1
+        qm importdisk {{ template_id }} {{ proxmox_iso_path }}/{{ local_iso_path | basename }} local-lvm
+        qm set {{ template_id }} -scsihw virtio-scsi-pci -virtio0 local-lvm:vm-{{ template_id }}-disk-0
+        qm set {{ template_id }} -serial0 socket
+        qm set {{ template_id }} -boot c -bootdisk virtio0
+        qm set { template_id } -agent 1
+        qm set {{ template_id }} -hotplug disk,network,usb
+        qm set {{ template_id }} -vcpus 1
+        qm set {{ template_id }} -vga qxl
+        qm set {{ template_id }} -ide2 local-lvm:cloudinit
+        qm resize {{ template_id }} virtio0 +4G
+        qm template {{ template_id }}

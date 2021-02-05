@@ -1,0 +1,12 @@
+proxmox_hostname_or_ip: 192.168.1.10
+proxmox_user: root@pam
+proxmox_node: pve
+
+redirector_count: 0
+redirector_hostname: redirector
+redirector_domain: tgif.home
+redirector_start_ip: 192.168.1.50/24
+redirector_default_gateway: 192.168.1.1
+redirector_user: redirector
+
+c2_ip: 192.168.1.1
