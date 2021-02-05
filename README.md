@@ -38,7 +38,7 @@ Modify the C2 configuration variables as necessary.
 c2/c2-config.yml
 ```
 
-Ensure the IP address of the C2 server is placed under the `[c2]` tag in inventory/hosts, as so:
+Ensure the IP address of the C2 server is placed under the `[c2]` tag in `inventory/hosts`, as so:
 
 ```text
 [c2]
@@ -76,7 +76,7 @@ Pay careful attention to the **redirector_start_ip** variable. Terraform will pr
 redirector/redirector-config.yml
 ```
 
-Ensure the IP address of the redirector(s) is placed under the `[redirector]` tag in inventory/hosts, as so:
+Ensure the IP address of the redirector(s) is placed under the `[redirector]` tag in `inventory/hosts`, as so:
 
 ```text
 [redirector]
@@ -112,7 +112,7 @@ Modify the phishing server configuration variables as necessary.
 phishing/phishing-config.yml
 ```
 
-Ensure the IP address of the Phishing server is placed under the `[phishing]` tag in inventory/hosts, as so:
+Ensure the IP address of the Phishing server is placed under the `[phishing]` tag in `inventory/hosts`, as so:
 
 ```text
 [phishing]
