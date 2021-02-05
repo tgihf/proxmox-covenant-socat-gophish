@@ -1,0 +1,72 @@
+- name: Configure GoPhish Phishing server
+  become: true
+  hosts: phishing
+  remote_user: '{{ phishing_server_user }}'
+
+  vars_files:
+    - phishing-config.yml  # phishing_server_user read from phishing-config.yml var file
+    
+  tasks:
+
+    - name: Install aptitude using apt
+      apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+
+    - name: Install required system packages
+      apt: name={{ item }} state=latest update_cache=yes
+      loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      apt: update_cache=yes name=docker-ce state=latest
+
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
+
+    - name: Add user to docker group
+      user:
+        name: "{{ phishing_server_user }}"
+        groups: docker
+        append: yes
+
+    - name: Reboot so docker group membership is activated
+      reboot:
+
+    - name: Start the GoPhish docker container
+      community.general.docker_container:
+        name: gophish
+        image: gophish/gophish
+        published_ports:
+          - 3333:3333
+          - 80:80
+        tty: yes
+        interactive: yes
+        restart_policy: always
+        container_default_behavior: compatibility
+
+    - name: Wait for 30 seconds before grepping GoPhish administrator credentials
+      wait_for:
+        timeout: 30
+    
+    - name: Grep GoPhish administrator credentials
+      shell: |
+        CONTAINER_ID=$(docker ps | grep gophish | cut -d' ' -f1)
+        docker logs $CONTAINER_ID | grep "Please login with the username admin and the password"
+      register: gophish_credentials
+    
+    - name: Print GoPhish administrator credentials
+      debug:
+        msg: "{{ gophish_credentials.stdout }}"
+
+    - name: Clean up any dangling Docker images
+      community.general.docker_prune:
+        images: yes

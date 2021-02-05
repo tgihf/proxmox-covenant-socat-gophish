@@ -31,4 +31,4 @@ override.tf.json
 # Images
 *.img
 
-c2_cloud_config.yml
+*_cloud_config.yml
